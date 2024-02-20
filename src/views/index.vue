@@ -5,12 +5,14 @@
 <template>
   <el-container class="container">
     <el-header class="top-main">
+      <!--
       <el-button
         type="primary"
         text
         color="#626aef"
-        @click="test"
+        @click="isWalletConnect"
         >connect wallet</el-button>
+        -->
       <div class="buttons-container">
         <template v-if="isConnect">
           <!-- 显示文本 -->
@@ -30,7 +32,7 @@
                 plain
                 color="#626aef"
                 :style="{ backgroundColor: '#0099ff', width: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center' }"
-              ><div class="addresses"><p class="address">{{ userWallet.walletAddress }}</p></div></el-button>            </template>
+              ><div class="addresses"><p class="address" style="color: #000000;">{{ userWallet.walletAddress }}</p></div></el-button>            </template>
           </el-popconfirm>
         </template>
         <template v-else>
@@ -42,15 +44,15 @@
             color="#626aef"
             @click="connecttoWallet = true"
             :style="{ backgroundColor: '#0099ff', width: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }"
-          >Connect Wallet</el-button>
+          ><div class="addresses"><p style="color: #000000;">Connect Wallet</p></div></el-button>
         </template>
       </div>
     </el-header>
     <el-main class="custom-container">
-      <el-tag size="large" :type="primary" effect="plain">userToken: {{ userAmount }}</el-tag>
+      <el-tag size="large" type="primary" effect="plain">userToken: {{ userAmount }}</el-tag>
       <p></p>
       <el-card class="work-card" >
-        <el-tabs class="el-tabs" v-model="selectedTab" stretch="true">
+        <el-tabs class="el-tabs" v-model="selectedTab" :stretch="true">
           <el-tab-pane label="Transfer" name="1">
             <div v-if="selectedTab === '1'" class="bordered-container">
               <el-text class="el_text" size="large" style="text-align: left;">To</el-text>
@@ -172,10 +174,10 @@
 
       <div class="dialog-footer">
         <el-button @click="connectedToeth">
-          <img src="https://app.permaswap.network/assets/MetaMask-00ff814a.svg"/>Metamask
+          <img src="https://app.permaswap.network/assets/MetaMask-00ff814a.svg" />Metamask
         </el-button>
         <el-button @click="connectToar">
-          Ar
+          <img src="https://app.permaswap.network/assets/arconnect-8daab209.svg" />ArConnect
         </el-button>
         <el-button @click="connecttoWallet = false">
           Confirm
@@ -201,6 +203,11 @@ import { userWalletAll } from '@/plugins/stores/modules/user-wallet'
 import { ethers, providers, utils } from 'ethers';
 
 import { transferToEth, transferToAr, stakeEth, stakeAr, unstakeEth, unstakeAr } from '../plugins/requests/request'
+
+
+
+
+
 
 const userWallet = userWalletAll()
 
@@ -279,6 +286,7 @@ const stakeIn = async() => {
     })
   }
   if ( walletType === 'Ar' ) {
+    console.log("goods")
     const res = await stakeAr(PoolSelect.value, stakeAmount.value)
     ElNotification({
       title: 'Transfer Success',
@@ -357,6 +365,7 @@ async function connectToar() {
       "ACCESS_PUBLIC_KEY",
       "SIGNATURE",
       "SIGN_TRANSACTION",
+      
     ]);
     const walletAddress = await injectedArweave.getActiveAddress();
     
@@ -380,18 +389,27 @@ async function isWalletConnect() {
   const userToken = getuserToken();
 
   userToken.then(result => {
-    userAmount.value = result.balances[utils.getAddress(userWallet.walletAddress)]
+    let userAddress = userWallet.walletAddress;
+    // 检查是否是以太坊地址格式
+    const ethereumAddressPattern = /^0x[a-fA-F0-9]{40}$/;
+    if (ethereumAddressPattern.test(userAddress)) {
+      // 如果是以太坊地址，则使用 utils.getAddress() 函数处理
+      userAmount.value = result.balances[utils.getAddress(userAddress)];
+    } else {
+      // 如果不是以太坊地址，则直接使用原始地址
+      userAmount.value = result.balances[userAddress];
+    }
   });
   
-  /*
-  if (accounts.length) {
+  
+  if (userWallet.walletAddress) {
     isConnect.value = true
-    console.log(`You're connected to: ${accounts[0]}`);
+    console.log("You're connected to",userWallet.walletAddress);
   } else {
     isConnect.value = false;
     console.log("Metamask is not connected");
   }
-  */
+  
 }
 
 const test = async() => {

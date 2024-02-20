@@ -2,7 +2,7 @@ import { getChain, transfer } from './halonode'
 import { userWalletAll } from '@/plugins/stores/modules/user-wallet'
 import { ref } from 'vue'
 import { connectWallet, signer } from '@/plugins/requests/ethers-connect'
-import { arSign } from '@/plugins/requests/arweave-connect'
+import { arSign, signMessageAsync } from '@/plugins/requests/arweave-connect'
 import { utils } from 'ethers'
 const userWallet = userWalletAll()
 
@@ -101,7 +101,7 @@ export const transferToAr = async(ToUser,Amount) => {
 	const Mes = 'dapp:' + chainMes.dapp + '\n' +
 			'chainID:' + chainMes.chainID + '\n' +
 			'action:' + action + '\n' +
-			'from:' + "8Ys7hXzLXIk4iJvaCzYSeuoCcDjXF0JBQZSRfiktwfw" + '\n' +
+			'from:' + userWallet.walletAddress + '\n' +
 			'fee:' + '0' + '\n' +
 			'feeRecipient:' + chainMes.feeRecipient.toString() + '\n' +
 			'nonce:' + currentTimestamp.value.toString() + '\n' +
@@ -110,13 +110,14 @@ export const transferToAr = async(ToUser,Amount) => {
 
 
 	//const a = await signer(Mes)
-	const a = await arSign(Mes)
+	const address = "test"
+	const a = await signMessageAsync ('false', 'use_wallet', address, Mes)
 	console.log("sign:",a)
 	const postData = {
 		"action": "transfer",
 		"params": JSON.stringify(params),
 		"sig": a,
-		"from": "8Ys7hXzLXIk4iJvaCzYSeuoCcDjXF0JBQZSRfiktwfw",
+		"from": userWallet.walletAddress,
 		"dapp": chainMes.dapp,
 		"chainID": chainMes.chainID,
 		"nonce": currentTimestamp.value.toString(),
@@ -250,30 +251,34 @@ export const stakeEth = async(Pool,Amount) => {
 export const stakeAr = async(Pool,Amount) => {
 	try {
 		const action = 'stake'
+
 		const chainMes = await getChain();
 		const params = {
 			"stakePool": Pool,
 			"amount": Amount
-	}
+		}
 	const currentTimestamp = ref(Date.now())
 	//let Mes = 'dapp:' + chainMes.dapp + '\n' + 'chainID:' + chainMes.chainID + '\n' + 'action:' + action + '\n' + 'from:' + ToUser + '\n' + 'fee:' + chainMes.fee + '\n' + 'feeRecipient:' + chainMes.feeRecipient + '\n' + 'nonce:' + chainMes.nonce + '\n' + 'version:' + chainMes.version + '\n' + 'params:' + chainMes.params + '\n'
 	const Mes = 'dapp:' + chainMes.dapp + '\n' +
 			'chainID:' + chainMes.chainID + '\n' +
 			'action:' + action + '\n' +
-			'from:' + utils.getAddress(userWallet.walletAddress) + '\n' +
+			'from:' + userWallet.walletAddress + '\n' +
 			'fee:' + '0' + '\n' +
 			'feeRecipient:' + chainMes.feeRecipient.toString() + '\n' +
 			'nonce:' + currentTimestamp.value.toString() + '\n' +
 			'version:' + 'v1' + '\n' +
 			'params:' + JSON.stringify(params) + '\n';
-	const a = await arSign(Mes)
+
+	const address = "test"
+
+	const a = await signMessageAsync ('false', 'use_wallet', address, Mes)
 	console.log(a)
 
 	const postData = {
 		"action": "stake",
 		"params": JSON.stringify(params),
 		"sig": a,
-		"from": utils.getAddress(userWallet.walletAddress),
+		"from": userWallet.walletAddress,
 		"dapp": chainMes.dapp,
 		"chainID": chainMes.chainID,
 		"nonce": currentTimestamp.value.toString(),
@@ -320,7 +325,7 @@ export const stakeAr = async(Pool,Amount) => {
 
 export const unstakeEth = async(Pool,Amount) => {
 	try {
-		const action = 'stake'
+		const action = 'unstake'
 		const chainMes = await getChain();
 		const params = {
 			"stakePool": Pool,
@@ -389,7 +394,7 @@ export const unstakeEth = async(Pool,Amount) => {
 
 export const unstakeAr = async(Pool,Amount) => {
 	try {
-		const action = 'stake'
+		const action = 'unstake'
 		const chainMes = await getChain();
 		const params = {
 			"stakePool": Pool,
@@ -400,20 +405,21 @@ export const unstakeAr = async(Pool,Amount) => {
 	const Mes = 'dapp:' + chainMes.dapp + '\n' +
 			'chainID:' + chainMes.chainID + '\n' +
 			'action:' + action + '\n' +
-			'from:' + utils.getAddress(userWallet.walletAddress) + '\n' +
+			'from:' + userWallet.walletAddress + '\n' +
 			'fee:' + '0' + '\n' +
 			'feeRecipient:' + chainMes.feeRecipient.toString() + '\n' +
 			'nonce:' + currentTimestamp.value.toString() + '\n' +
 			'version:' + 'v1' + '\n' +
 			'params:' + JSON.stringify(params) + '\n';
-	const a = await arSign(Mes)
+	const address = "test";
+	const a = await signMessageAsync ('false', 'use_wallet', address, Mes)
 	console.log(a)
 
 	const postData = {
 		"action": "unstake",
 		"params": JSON.stringify(params),
 		"sig": a,
-		"from": utils.getAddress(userWallet.walletAddress),
+		"from": userWallet.walletAddress,
 		"dapp": chainMes.dapp,
 		"chainID": chainMes.chainID,
 		"nonce": currentTimestamp.value.toString(),
@@ -421,7 +427,7 @@ export const unstakeAr = async(Pool,Amount) => {
 		"feeRecipient": chainMes.feeRecipient.toString(),
 		"fee": "0"
 	}
-	console.log(postData)
+	
 	function toDict(postData) {
 		return {
 			dapp: postData.dapp,
