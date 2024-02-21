@@ -77,11 +77,9 @@ export const transferToEth = async(ToUser,Amount) => {
 		return response
 	} catch (error) {
 		// 处理错误
-		console.log("-----test1bads");
 		console.error(error);
+		return error
 	}
-    	console.log("-----test1goods");
-        console.log(response);
 
 
 	} catch (error) {
@@ -164,9 +162,8 @@ export const transferToAr = async(ToUser,Amount) => {
 		// 处理错误
 		console.log("-----test1bads");
 		console.error(error);
+		return error
 	}
-    	console.log("-----test1goods");
-        console.log(response);
 
   
 	} catch (error) {
@@ -234,9 +231,10 @@ export const stakeEth = async(Pool,Amount) => {
 		// 处理响应
 		return response
 	} catch (error) {
-	// 处理错误
-	console.log("-----test1bads");
-	console.error(error);
+		// 处理错误
+		console.log("-----test1bads");
+		console.error(error);
+		return error
 	}
 	  //console.log("Mes:",Mes)
 	  //console.log('Data from API:', chainMes);
@@ -306,9 +304,10 @@ export const stakeAr = async(Pool,Amount) => {
 		// 处理响应
 		return response
 	} catch (error) {
-	// 处理错误
-	console.log("-----test1bads");
-	console.error(error);
+		// 处理错误
+		console.log("-----test1bads");
+		console.error(error);
+		return error
 	}
 	  //console.log("Mes:",Mes)
 	  //console.log('Data from API:', chainMes);
@@ -378,9 +377,10 @@ export const unstakeEth = async(Pool,Amount) => {
 	// 处理响应
 	return response
 	} catch (error) {
-	// 处理错误
-	console.log("-----test1bads");
-	console.error(error);
+		// 处理错误
+		console.log("-----test1bads");
+		console.error(error);
+		return error
 	}
 	  //console.log("Mes:",Mes)
 	  //console.log('Data from API:', chainMes);
@@ -448,9 +448,10 @@ export const unstakeAr = async(Pool,Amount) => {
 	// 处理响应
 	return response
 	} catch (error) {
-	// 处理错误
-	console.log("-----test1bads");
-	console.error(error);
+		// 处理错误
+		console.log("-----test1bads");
+		console.error(error);
+		return error
 	}
 	  //console.log("Mes:",Mes)
 	  //console.log('Data from API:', chainMes);

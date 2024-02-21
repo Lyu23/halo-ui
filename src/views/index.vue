@@ -5,14 +5,18 @@
 <template>
   <el-container class="container">
     <el-header class="top-main">
-      <!--
+      
       <el-button
         type="primary"
         text
         color="#626aef"
         @click="isWalletConnect"
         >connect wallet</el-button>
-        -->
+        
+      <div class="title-halo">
+        <img src="@/assets/halo-svg.svg"/>
+        <p> Halo</p>
+      </div>
       <div class="buttons-container">
         <template v-if="isConnect">
           <!-- 显示文本 -->
@@ -49,7 +53,18 @@
       </div>
     </el-header>
     <el-main class="custom-container">
-      <el-tag size="large" type="primary" effect="plain">userToken: {{ userAmount }}</el-tag>
+      <div>
+        <el-tag size="large" type="primary" effect="plain">balance: {{ formattedUserAmount }}Halo</el-tag>
+        <el-tag
+          v-for="(pool, index) in PoolsAmount"
+          :key="index"
+          size="large"
+          type="primary"
+          effect="plain"
+        >
+          {{ pool.stakePool }}: {{ pool.amount }}
+        </el-tag>
+      </div>
       <p></p>
       <el-card class="work-card" >
         <el-tabs class="el-tabs" v-model="selectedTab" :stretch="true">
@@ -82,7 +97,7 @@
               <el-text class="el_text" size="large" style="text-align: left;" >Pool</el-text>
               <el-select v-model="PoolSelect" placeholder="Pool">
                 <el-option
-                  v-for="item in Pools"
+                  v-for="item in StakePools"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -121,7 +136,7 @@
               <el-text class="el_text" size="large" style="text-align: left;">Pool</el-text>
               <el-select v-model="PoolSelect" placeholder="Pool">
                 <el-option
-                  v-for="item in Pools"
+                  v-for="item in unStakePools"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -193,7 +208,7 @@
 
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { ElConfigProvider, ElNotification } from 'element-plus'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import en from 'element-plus/dist/locale/en.mjs'
@@ -224,6 +239,17 @@ const switchLanguage = (lang) => {
 const isConnect = ref(false)
 //输入框中内容
 const userAmount = ref('')
+// 计算属性：将 userAmount 数量除以 10^18 并保留 4 位小数
+const formattedUserAmount = computed(() => {
+  if (!userAmount.value) return ''; // 处理用户还未输入的情况
+  
+  const amountBigInt = BigInt(userAmount.value); // 将字符串转换为 BigInt 类型
+  const amount = amountBigInt; // 将用户输入的值除以10^18
+  return amount.toString() // 保留四位小数，不进行四舍五入
+});
+// 用户的质押池数量
+const PoolsAmount = ref([]);
+
 const ToUser = ref('');
 const Amount = ref('');
 const stakeAmount = ref(''); //质押的数量
@@ -232,15 +258,21 @@ const selectedTab = ref('1');
 //选中的pool
 const PoolSelect = ref('');
 
-const Pools = [
+const StakePools = [
+  {
+    value: 'basic',
+    label: 'basic',
+  },
+]
+const unStakePools = [
   {
     value: 'basic',
     label: 'basic',
   },
   {
-    value: 'dev',
-    label: 'dev',
-  },
+    value: 'admin',
+    label: 'admin',
+  }
 ]
 
 
@@ -260,55 +292,110 @@ const fetchData = async () => {
 
 const TransFer = async() => {
   const walletType = userWallet.walletType
-  if ( walletType === 'Eth' ) {
-    const res = await transferToEth(ToUser.value, Amount.value)
-    ElNotification({
-      title: 'Transfer Success',
-      message: `response is: ${res.everHash}`,
-    })
-  }
-  if ( walletType === 'Ar' ) {
-    const res = await transferToAr(ToUser.value, Amount.value)
-    ElNotification({
-      title: 'Transfer Success',
-      message: `response is: ${res.everHash}`,
-    })
-  }
-  
+
+    if ( walletType === 'Eth' ) {
+      const res = await transferToEth(ToUser.value, Amount.value)
+      if (res.everHash) {
+        ElNotification({
+          title: 'Transfer Success',
+          message: `response is: ${res.everHash}`,
+          type: 'success',
+        })
+      } else {
+        ElNotification({
+          title: 'Transfer Failed',
+          message: `response is: ${res.response.data}`,
+          type: 'error',
+        })
+      }
+    }
+    if ( walletType === 'Ar' ) {
+      const res = await transferToAr(ToUser.value, Amount.value)
+      if (res.everHash) {
+        ElNotification({
+          title: 'Transfer Success',
+          message: `response is: ${res.everHash}`,
+          type: 'success',
+        })
+      } else {
+        ElNotification({
+          title: 'Transfer Failed',
+          message: `response is: ${res.response.data}`,
+          type: 'error',
+        })
+      }
+    }
+
 }
 const stakeIn = async() => {
   const walletType = userWallet.walletType
   if ( walletType === 'Eth' ) {
     const res = await stakeEth(PoolSelect.value, stakeAmount.value)
-    ElNotification({
-      title: 'stake Success',
-      message: `response is: ${res.everHash}`,
-    })
+    if (res.everHash) {
+      ElNotification({
+        title: 'Transfer Success',
+        message: `response is: ${res.everHash}`,
+        type: 'success',
+      })
+    } else {
+      ElNotification({
+        title: 'Transfer Failed',
+        message: `response is: ${res.response.data}`,
+        type: 'error',
+      })
+    }
   }
   if ( walletType === 'Ar' ) {
     console.log("goods")
     const res = await stakeAr(PoolSelect.value, stakeAmount.value)
-    ElNotification({
-      title: 'Transfer Success',
-      message: `response is: ${res.everHash}`,
-    })
+    if (res.everHash) {
+      ElNotification({
+        title: 'Transfer Success',
+        message: `response is: ${res.everHash}`,
+        type: 'success',
+      })
+    } else {
+      ElNotification({
+        title: 'Transfer Failed',
+        message: `response is: ${res.response.data}`,
+        type: 'error',
+      })
+    }
   }
 }
 const unstakeOut = async() => {
   const walletType = userWallet.walletType
   if ( walletType === 'Eth' ) {
     const res = await unstakeEth(PoolSelect.value, unstakeAmount.value)
-    ElNotification({
-      title: 'unstake Success',
-      message: `response is: ${res.everHash}`,
-    })
+    if (res.everHash) {
+      ElNotification({
+        title: 'Transfer Success',
+        message: `response is: ${res.everHash}`,
+        type: 'success',
+      })
+    } else {
+      ElNotification({
+        title: 'Transfer Failed',
+        message: `response is: ${res.response.data}`,
+        type: 'error',
+      })
+    }
   }
   if ( walletType === 'Ar' ) {
     const res = await unstakeAr(PoolSelect.value, unstakeAmount.value)
-    ElNotification({
-      title: 'unstake Success',
-      message: `response is: ${res.everHash}`,
-    })
+    if (res.everHash) {
+      ElNotification({
+        title: 'Transfer Success',
+        message: `response is: ${res.everHash}`,
+        type: 'success',
+      })
+    } else {
+      ElNotification({
+        title: 'Transfer Failed',
+        message: `response is: ${res.response.data}`,
+        type: 'error',
+      })
+    }
   }
 }
 
@@ -387,7 +474,7 @@ onMounted(() => {
 async function isWalletConnect() {
   //const accounts = await ethereum.request({method: 'eth_accounts'});
   const userToken = getuserToken();
-
+  
   userToken.then(result => {
     let userAddress = userWallet.walletAddress;
     // 检查是否是以太坊地址格式
@@ -395,6 +482,20 @@ async function isWalletConnect() {
     if (ethereumAddressPattern.test(userAddress)) {
       // 如果是以太坊地址，则使用 utils.getAddress() 函数处理
       userAmount.value = result.balances[utils.getAddress(userAddress)];
+      let basicStake = 0;
+      let adminStake = 0;
+      if (result.stakes['0x47e6a1b1BF648c3328679fCFbfeb0b768877b696'].basic) {
+        result.stakes['0x47e6a1b1BF648c3328679fCFbfeb0b768877b696'].basic.forEach(item => {
+          basicStake += parseFloat(item.amount);
+        });
+        PoolsAmount.value.push({"stakePool": "basic","amount": basicStake});
+      }
+      if (result.stakes['0x47e6a1b1BF648c3328679fCFbfeb0b768877b696'].admin) {
+        result.stakes['0x47e6a1b1BF648c3328679fCFbfeb0b768877b696'].admin.forEach(item => {
+          basicStake += parseFloat(item.amount);
+        });
+        PoolsAmount.value.push({"stakePool": "admin","amount": basicStake});
+      }
     } else {
       // 如果不是以太坊地址，则直接使用原始地址
       userAmount.value = result.balances[userAddress];
@@ -428,7 +529,10 @@ const test = async() => {
   border: 5px solid #000000
 }
 .top-main {
+  margin-top: 20px;
   width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 
 .custom-container {
@@ -469,6 +573,10 @@ const test = async() => {
   text-overflow: ellipsis;
 }
 
+.title-halo {
+  display: flex;
+  justify-content: flex-start;
+}
 .buttons-container {
   display: flex;
   justify-content: flex-end; /* 将按钮放置在容器的右侧 */
