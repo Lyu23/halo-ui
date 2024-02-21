@@ -5,17 +5,17 @@
 <template>
   <el-container class="container">
     <el-header class="top-main">
-      
+      <!--
       <el-button
         type="primary"
         text
         color="#626aef"
         @click="isWalletConnect"
         >connect wallet</el-button>
-        
+      -->
       <div class="title-halo">
-        <img src="@/assets/halo-svg.svg"/>
-        <p> Halo</p>
+        <img class="title-img" src="@/assets/halo-svg.svg"/>
+        <h2 class="haloTitle"> Halo</h2>
       </div>
       <div class="buttons-container">
         <template v-if="isConnect">
@@ -35,7 +35,7 @@
                 text
                 plain
                 color="#626aef"
-                :style="{ backgroundColor: '#0099ff', width: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center' }"
+                :style="{ backgroundColor: '#0099ff', width: '143px', height: '39px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center' }"
               ><div class="addresses"><p class="address" style="color: #000000;">{{ userWallet.walletAddress }}</p></div></el-button>            </template>
           </el-popconfirm>
         </template>
@@ -47,24 +47,36 @@
             plain
             color="#626aef"
             @click="connecttoWallet = true"
-            :style="{ backgroundColor: '#0099ff', width: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }"
+            :style="{ backgroundColor: '#0099ff', width: '143px', height: '39px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }"
           ><div class="addresses"><p style="color: #000000;">Connect Wallet</p></div></el-button>
         </template>
       </div>
     </el-header>
     <el-main class="custom-container">
-      <div>
-        <el-tag size="large" type="primary" effect="plain">balance: {{ formattedUserAmount }}Halo</el-tag>
+
         <el-tag
-          v-for="(pool, index) in PoolsAmount"
-          :key="index"
+          size="large"
+          type="primary" 
+          effect="plain"
+          style="margin: 10px 0 10px 0;"
+          class="el-tag-bal"
+          >
+          <span style="font-family: Arial; color: rgb(22, 20, 20); font-weight: bold; font-size: 16px">Balance:</span> {{ formattedUserAmount }}Halo
+        </el-tag>
+        <el-tag
           size="large"
           type="primary"
           effect="plain"
+          style="margin: 10px 0 10px 0;"
+          class="el-tag-stake"
         >
-          {{ pool.stakePool }}: {{ pool.amount }}
+          <p style="margin: -2px 0 5px 0;font-family: Arial; color: rgb(22, 20, 20); font-weight: bold;font-size: 16px;">Stake</p>
+          <div style="display: flex;flex-direction: column;">
+            <div v-for="(pool, index) in PoolsAmount" :key="index">
+              <span style="font-family: Arial; color: rgb(22, 20, 20); font-weight: bold; font-size: 15px">{{ pool.stakePool }}: </span>{{ pool.amount }} Halo
+            </div>
+          </div>
         </el-tag>
-      </div>
       <p></p>
       <el-card class="work-card" >
         <el-tabs class="el-tabs" v-model="selectedTab" :stretch="true">
@@ -194,12 +206,15 @@
         <el-button @click="connectToar">
           <img src="https://app.permaswap.network/assets/arconnect-8daab209.svg" />ArConnect
         </el-button>
+        <!--
         <el-button @click="connecttoWallet = false">
           Confirm
         </el-button>
+        -->
       </div>
 
   </el-dialog>
+  <div v-if="refreshFlag">界面已刷新</div>
   </el-container>
 </template>
 
@@ -221,7 +236,7 @@ import { transferToEth, transferToAr, stakeEth, stakeAr, unstakeEth, unstakeAr }
 
 
 
-
+const decimals = ref(18) //目前的halo单位
 
 
 const userWallet = userWalletAll()
@@ -235,18 +250,21 @@ const switchLanguage = (lang) => {
     locale.value = zhCn;
   }
 };
-
+import { Decimal } from 'decimal.js'
 const isConnect = ref(false)
 //输入框中内容
 const userAmount = ref('')
 // 计算属性：将 userAmount 数量除以 10^18 并保留 4 位小数
 const formattedUserAmount = computed(() => {
   if (!userAmount.value) return ''; // 处理用户还未输入的情况
-  
-  const amountBigInt = BigInt(userAmount.value); // 将字符串转换为 BigInt 类型
-  const amount = amountBigInt; // 将用户输入的值除以10^18
-  return amount.toString() // 保留四位小数，不进行四舍五入
+
+  var a1 = 10 ** decimals.value
+  let HaloAmount = new Decimal(userAmount.value).div(new Decimal(a1))
+
+  return HaloAmount.toNumber().toFixed(4) // 保留四位小数，不进行四舍五入
 });
+
+
 // 用户的质押池数量
 const PoolsAmount = ref([]);
 
@@ -290,47 +308,54 @@ const fetchData = async () => {
   }
 };
 
+const refreshFlag = ref(false); // 创建一个响应式数据，用于触发界面刷新
+
 const TransFer = async() => {
   const walletType = userWallet.walletType
+  const a = 10 ** decimals.value
 
-    if ( walletType === 'Eth' ) {
-      const res = await transferToEth(ToUser.value, Amount.value)
-      if (res.everHash) {
-        ElNotification({
-          title: 'Transfer Success',
-          message: `response is: ${res.everHash}`,
-          type: 'success',
-        })
-      } else {
-        ElNotification({
-          title: 'Transfer Failed',
-          message: `response is: ${res.response.data}`,
-          type: 'error',
-        })
-      }
+  if ( walletType === 'Eth' ) {
+    const res = await transferToEth(ToUser.value, (Amount.value * a).toString())
+    if (res.everHash) {
+      ElNotification({
+        title: 'Transfer Success',
+        message: `response is: ${res.everHash}`,
+        type: 'success',
+      })
+    } else {
+      ElNotification({
+        title: 'Transfer Failed',
+        message: `response is: ${res.response.data}`,
+        type: 'error',
+      })
     }
-    if ( walletType === 'Ar' ) {
-      const res = await transferToAr(ToUser.value, Amount.value)
-      if (res.everHash) {
-        ElNotification({
-          title: 'Transfer Success',
-          message: `response is: ${res.everHash}`,
-          type: 'success',
-        })
-      } else {
-        ElNotification({
-          title: 'Transfer Failed',
-          message: `response is: ${res.response.data}`,
-          type: 'error',
-        })
-      }
+  }
+  if ( walletType === 'Ar' ) {
+    const res = await transferToAr(ToUser.value, (Amount.value * a).toString())
+    if (res.everHash) {
+      ElNotification({
+        title: 'Transfer Success',
+        message: `response is: ${res.everHash}`,
+        type: 'success',
+      })
+    } else {
+      ElNotification({
+        title: 'Transfer Failed',
+        message: `response is: ${res.response.data}`,
+        type: 'error',
+      })
     }
-
+  }
+  // 等待5秒后，修改refreshFlag以触发界面刷新
+  setTimeout(() => {
+    location.reload()
+  }, 5000);
 }
 const stakeIn = async() => {
   const walletType = userWallet.walletType
+  const a = 10 ** decimals.value
   if ( walletType === 'Eth' ) {
-    const res = await stakeEth(PoolSelect.value, stakeAmount.value)
+    const res = await stakeEth(PoolSelect.value, (stakeAmount.value * a).toString())
     if (res.everHash) {
       ElNotification({
         title: 'Transfer Success',
@@ -347,7 +372,7 @@ const stakeIn = async() => {
   }
   if ( walletType === 'Ar' ) {
     console.log("goods")
-    const res = await stakeAr(PoolSelect.value, stakeAmount.value)
+    const res = await stakeAr(PoolSelect.value, (stakeAmount.value * a).toString())
     if (res.everHash) {
       ElNotification({
         title: 'Transfer Success',
@@ -362,11 +387,16 @@ const stakeIn = async() => {
       })
     }
   }
+  // 等待5秒后，修改refreshFlag以触发界面刷新
+  setTimeout(() => {
+    location.reload()
+  }, 5000);
 }
 const unstakeOut = async() => {
   const walletType = userWallet.walletType
+  const a = 10 ** decimals.value
   if ( walletType === 'Eth' ) {
-    const res = await unstakeEth(PoolSelect.value, unstakeAmount.value)
+    const res = await unstakeEth(PoolSelect.value, (unstakeAmount.value * a).toString())
     if (res.everHash) {
       ElNotification({
         title: 'Transfer Success',
@@ -382,7 +412,7 @@ const unstakeOut = async() => {
     }
   }
   if ( walletType === 'Ar' ) {
-    const res = await unstakeAr(PoolSelect.value, unstakeAmount.value)
+    const res = await unstakeAr(PoolSelect.value, (unstakeAmount.value * a).toString())
     if (res.everHash) {
       ElNotification({
         title: 'Transfer Success',
@@ -397,6 +427,10 @@ const unstakeOut = async() => {
       })
     }
   }
+  // 等待5秒后，修改refreshFlag以触发界面刷新
+  setTimeout(() => {
+    location.reload()
+  }, 5000);
 }
 
 // 监听 count 变量的变化
@@ -437,8 +471,8 @@ async function disconnect() {
   }
   userWallet.setwalletAddress('')
   isWalletConnect();
-  
   userAmount.value = ''
+  location.reload()
 }
 
 import Arweave from 'arweave'
@@ -474,7 +508,6 @@ onMounted(() => {
 async function isWalletConnect() {
   //const accounts = await ethereum.request({method: 'eth_accounts'});
   const userToken = getuserToken();
-  
   userToken.then(result => {
     let userAddress = userWallet.walletAddress;
     // 检查是否是以太坊地址格式
@@ -482,23 +515,47 @@ async function isWalletConnect() {
     if (ethereumAddressPattern.test(userAddress)) {
       // 如果是以太坊地址，则使用 utils.getAddress() 函数处理
       userAmount.value = result.balances[utils.getAddress(userAddress)];
-      let basicStake = 0;
-      let adminStake = 0;
-      if (result.stakes['0x47e6a1b1BF648c3328679fCFbfeb0b768877b696'].basic) {
-        result.stakes['0x47e6a1b1BF648c3328679fCFbfeb0b768877b696'].basic.forEach(item => {
-          basicStake += parseFloat(item.amount);
+      let basicStake = new Decimal(0);
+      let adminStake = new Decimal(0);
+      if (result.stakes[utils.getAddress(userAddress)].basic) {
+        result.stakes[utils.getAddress(userAddress)].basic.forEach(item => {
+          let amount = new Decimal(item.amount);
+          // 将当前 amount 累加到 basicStake
+          basicStake = basicStake.plus(amount);
         });
-        PoolsAmount.value.push({"stakePool": "basic","amount": basicStake});
+        basicStake = basicStake.div(new Decimal(10).pow(decimals.value));
+        
+        PoolsAmount.value.push({"stakePool": "basic","amount": basicStake.toFixed(4).toString()});
       }
-      if (result.stakes['0x47e6a1b1BF648c3328679fCFbfeb0b768877b696'].admin) {
-        result.stakes['0x47e6a1b1BF648c3328679fCFbfeb0b768877b696'].admin.forEach(item => {
-          basicStake += parseFloat(item.amount);
+      if (result.stakes[utils.getAddress(userAddress)].admin) {
+        result.stakes[utils.getAddress(userAddress)].admin.forEach(item => {
+          let amount = new Decimal(item.amount);
+          adminStake = adminStake.plus(amount);
         });
-        PoolsAmount.value.push({"stakePool": "admin","amount": basicStake});
+        PoolsAmount.value.push({"stakePool": "admin","amount": adminStake.toFixed(4).toString()});
       }
     } else {
       // 如果不是以太坊地址，则直接使用原始地址
       userAmount.value = result.balances[userAddress];
+
+      let basicStake = new Decimal(0);
+      let adminStake = new Decimal(0);
+      if (result.stakes[userAddress].basic) {
+        result.stakes[userAddress].basic.forEach(item => {
+          let amount = new Decimal(item.amount);
+          // 将当前 amount 累加到 basicStake
+          basicStake = basicStake.plus(amount);
+        });
+        basicStake = basicStake.div(new Decimal(10).pow(decimals.value));
+        PoolsAmount.value.push({"stakePool": "basic","amount": basicStake.toFixed(4).toString()});
+      }
+      if (result.stakes[userAddress].admin) {
+        result.stakes[userAddress].admin.forEach(item => {
+          let amount = new Decimal(item.amount);
+          adminStake = adminStake.plus(amount);
+        });
+        PoolsAmount.value.push({"stakePool": "admin","amount": adminStake.toFixed(4).toString()});
+      }
     }
   });
   
@@ -513,11 +570,6 @@ async function isWalletConnect() {
   
 }
 
-const test = async() => {
-  const a = await arSign()
-  
-  
-}
 
 </script>
 
@@ -576,10 +628,21 @@ const test = async() => {
 .title-halo {
   display: flex;
   justify-content: flex-start;
+  margin: 50px 0 0 10px;
+  align-items: center;
+}
+.title-img {
+  width: 9em
+}
+.haloTitle {
+  font-size: 4.3em;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px skyblue, 0 0 20px skyblue, 0 0 40px skyblue, 0 0 80px skyblue, 0 0 160px skyblue;
 }
 .buttons-container {
   display: flex;
   justify-content: flex-end; /* 将按钮放置在容器的右侧 */
+  margin: 20px 50px 0 0;
 }
 
 .bordered-container {
@@ -617,4 +680,17 @@ const test = async() => {
 :deep(.el-tabs__item.is-active) {
   color: #1ae3f1;
 }
+
+.el-tag-stake {
+  display: inline-flex; /* 使用内联的 Flexbox 布局 */
+  align-items: center; /* 垂直居中 */
+  height: 70px;
+  width: 200px;
+}
+.el-tag-bal {
+  display: inline-flex; /* 使用内联的 Flexbox 布局 */
+  align-items: center; /* 垂直居中 */
+  width: 200px;
+}
+
 </style>
