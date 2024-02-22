@@ -19,7 +19,7 @@
       </div>
       <div class="buttons-container">
         <template v-if="isConnect">
-          <!-- 显示文本 -->
+          <!-- Show text -->
           <el-popconfirm
             confirm-button-text="Yes"
             cancel-button-text="No"
@@ -40,7 +40,7 @@
           </el-popconfirm>
         </template>
         <template v-else>
-          <!-- 显示按钮 -->
+          <!-- Show button -->
           <el-button
             type="primary"
             text
@@ -188,7 +188,7 @@
     <!--
     <div>{{ $t('common.title') }}</div>
     <button @click="switchLanguage('en')">Switch to English</button>
-    <button @click="switchLanguage('zh')">切换到中文</button>
+    <button @click="switchLanguage('zh')">Switch to Chinese</button>
     -->
     <el-dialog
       v-model="connecttoWallet"
@@ -214,7 +214,7 @@
       </div>
 
   </el-dialog>
-  <div v-if="refreshFlag">界面已刷新</div>
+
   </el-container>
 </template>
 
@@ -252,28 +252,28 @@ const switchLanguage = (lang) => {
 };
 import { Decimal } from 'decimal.js'
 const isConnect = ref(false)
-//输入框中内容
+//Enter the contents of the box
 const userAmount = ref('')
-// 计算属性：将 userAmount 数量除以 10^18 并保留 4 位小数
+// Calculation property: Divide the userAmount amount by 10^18 and retain 4 decimals
 const formattedUserAmount = computed(() => {
-  if (!userAmount.value) return ''; // 处理用户还未输入的情况
+  if (!userAmount.value) return ''; // Handling cases where the user has not yet entered
 
   var a1 = 10 ** decimals.value
   let HaloAmount = new Decimal(userAmount.value).div(new Decimal(a1))
 
-  return HaloAmount.toNumber().toFixed(4) // 保留四位小数，不进行四舍五入
+  return HaloAmount.toNumber().toFixed(4) // Keep four decimals, no rounding
 });
 
 
-// 用户的质押池数量
+// Number of pledge pools for users
 const PoolsAmount = ref([]);
 
 const ToUser = ref('');
 const Amount = ref('');
-const stakeAmount = ref(''); //质押的数量
+const stakeAmount = ref(''); //Number of stake
 const unstakeAmount = ref('');
 const selectedTab = ref('1');
-//选中的pool
+
 const PoolSelect = ref('');
 
 const StakePools = [
@@ -304,11 +304,11 @@ const fetchData = async () => {
     console.log('Data from API:', data);
   } catch (error) {
     console.error('Error fetching data:', error);
-    // 处理错误
+    // process error
   }
 };
 
-const refreshFlag = ref(false); // 创建一个响应式数据，用于触发界面刷新
+
 
 const TransFer = async() => {
   const walletType = userWallet.walletType
@@ -346,7 +346,7 @@ const TransFer = async() => {
       })
     }
   }
-  // 等待5秒后，修改refreshFlag以触发界面刷新
+  // Wait 5 seconds to trigger an interface refresh
   setTimeout(() => {
     location.reload()
   }, 5000);
@@ -387,7 +387,7 @@ const stakeIn = async() => {
       })
     }
   }
-  // 等待5秒后，修改refreshFlag以触发界面刷新
+  // Wait 5 seconds to trigger an interface refresh
   setTimeout(() => {
     location.reload()
   }, 5000);
@@ -427,19 +427,19 @@ const unstakeOut = async() => {
       })
     }
   }
-  // 等待5秒后，修改refreshFlag以触发界面刷新
+  // Wait 5 seconds to trigger an interface refresh
   setTimeout(() => {
     location.reload()
   }, 5000);
 }
 
-// 监听 count 变量的变化
+// Listen for changes to the count variable
 watch(isConnect.value, () => {
-  // 刷新页面逻辑
+  // Refresh page logic
   location.reload()
 })
 
-//metamask的eth钱包连接//
+//metamask's eth wallet connection//
 async function connectedToeth() {
   await connectWallet()
   const accounts = await ethereum.request({method: 'eth_accounts'});       
@@ -458,11 +458,11 @@ async function connectedToeth() {
   }
 }
 async function disconnect() {
-  isConnect.value = false //取消钱包连接
+  isConnect.value = false //Cancel wallet connection
   if (window.ethereum) {
    
     await window.ethereum.on("disconnect", (error) => {
-      // 处理断开连接事件
+      // Handling disconnection events
     });
     
   }
@@ -490,7 +490,7 @@ async function connectToar() {
     ]);
     const walletAddress = await injectedArweave.getActiveAddress();
     
-    // 连接成功后的处理逻辑
+    // Processing logic after successful connection
     connecttoWallet.value = false;
     userWallet.setwalletAddress(walletAddress)
     userWallet.setwalletType("Ar")
@@ -498,7 +498,7 @@ async function connectToar() {
     isWalletConnect()
   } catch (error) {
     console.error('Failed to connect to Arweave wallet:', error);
-    // 处理连接失败的情况
+    // Handling connection failures
   }
 }
 onMounted(() => {
@@ -510,17 +510,17 @@ async function isWalletConnect() {
   const userToken = getuserToken();
   userToken.then(result => {
     let userAddress = userWallet.walletAddress;
-    // 检查是否是以太坊地址格式
+    // Check if it's an Ethernet address format
     const ethereumAddressPattern = /^0x[a-fA-F0-9]{40}$/;
     if (ethereumAddressPattern.test(userAddress)) {
-      // 如果是以太坊地址，则使用 utils.getAddress() 函数处理
+      // If it's an Ethernet address, use the utils.getAddress() function to handle it
       userAmount.value = result.balances[utils.getAddress(userAddress)];
       let basicStake = new Decimal(0);
       let adminStake = new Decimal(0);
       if (result.stakes[utils.getAddress(userAddress)].basic) {
         result.stakes[utils.getAddress(userAddress)].basic.forEach(item => {
           let amount = new Decimal(item.amount);
-          // 将当前 amount 累加到 basicStake
+          // Accumulate the current amount to basicStake
           basicStake = basicStake.plus(amount);
         });
         basicStake = basicStake.div(new Decimal(10).pow(decimals.value));
@@ -535,7 +535,7 @@ async function isWalletConnect() {
         PoolsAmount.value.push({"stakePool": "admin","amount": adminStake.toFixed(4).toString()});
       }
     } else {
-      // 如果不是以太坊地址，则直接使用原始地址
+      // If it is not an Ethernet address, the original address is used directly
       userAmount.value = result.balances[userAddress];
 
       let basicStake = new Decimal(0);
@@ -543,7 +543,7 @@ async function isWalletConnect() {
       if (result.stakes[userAddress].basic) {
         result.stakes[userAddress].basic.forEach(item => {
           let amount = new Decimal(item.amount);
-          // 将当前 amount 累加到 basicStake
+          // Accumulate the current amount to basicStake
           basicStake = basicStake.plus(amount);
         });
         basicStake = basicStake.div(new Decimal(10).pow(decimals.value));
@@ -641,7 +641,7 @@ async function isWalletConnect() {
 }
 .buttons-container {
   display: flex;
-  justify-content: flex-end; /* 将按钮放置在容器的右侧 */
+  justify-content: flex-end; /* Place the button on the right side of the container */
   margin: 20px 50px 0 0;
 }
 
@@ -674,7 +674,7 @@ async function isWalletConnect() {
 }
 
 :deep(.el-tabs__item) {
-  color: #dbe0e0; /* 设置标签默认文字颜色 */
+  color: #dbe0e0; /* Setting the default text color for labels */
 }
 
 :deep(.el-tabs__item.is-active) {
@@ -682,14 +682,14 @@ async function isWalletConnect() {
 }
 
 .el-tag-stake {
-  display: inline-flex; /* 使用内联的 Flexbox 布局 */
-  align-items: center; /* 垂直居中 */
+  display: inline-flex;
+  align-items: center; 
   height: 70px;
   width: 200px;
 }
 .el-tag-bal {
-  display: inline-flex; /* 使用内联的 Flexbox 布局 */
-  align-items: center; /* 垂直居中 */
+  display: inline-flex; 
+  align-items: center;
   width: 200px;
 }
 

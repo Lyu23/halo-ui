@@ -41,42 +41,13 @@ export const transferToEth = async(ToUser,Amount) => {
 		"feeRecipient": chainMes.feeRecipient.toString(),
 		"fee": "0"
 	}
-	function toDict(postData) {
-		return {
-			dapp: postData.dapp,
-			chainID: postData.chainId, // 修改为正确的属性名
-			action: postData.action,
-			from: postData.from,
-			fee: postData.fee,
-			feeRecipient: postData.feeRecipient,
-			nonce: postData.nonce,
-			version: postData.version,
-			params: postData.params, // 将字符串解析为 JSON 对象
-			sig: postData.sign
-		};
-	}
-	/*
-	transfer(JSON.stringify(postData))
-	  .then(response => {
-		// 处理响应
-		console.log("-----test1goods")
-		console.log(response);
-		return response;
-	  })
-	  .catch(error => {
-		// 处理错误
-		console.log("-----test1bads")
-		console.error(error);
-	  });
-	  */
-	  //console.log("Mes:",Mes)
-	  //console.log('Data from API:', chainMes);
+
 	try {
 		const response = await transfer(JSON.stringify(postData));
-		// 处理响应
+		// Processing Response
 		return response
 	} catch (error) {
-		// 处理错误
+		// process error
 		console.error(error);
 		return error
 	}
@@ -123,43 +94,13 @@ export const transferToAr = async(ToUser,Amount) => {
 		"feeRecipient": chainMes.feeRecipient.toString(),
 		"fee": "0"
 	}
-	console.log("postData:",postData)
-	function toDict(postData) {
-		return {
-			dapp: postData.dapp,
-			chainID: postData.chainId, // 修改为正确的属性名
-			action: postData.action,
-			from: postData.from,
-			fee: postData.fee,
-			feeRecipient: postData.feeRecipient,
-			nonce: postData.nonce,
-			version: postData.version,
-			params: postData.params, // 将字符串解析为 JSON 对象
-			sig: postData.sign
-		};
-	}
-	/*
-	transfer(JSON.stringify(postData))
-	  .then(response => {
-		// 处理响应
-		console.log("-----test1goods")
-		console.log(response);
-		return response;
-	  })
-	  .catch(error => {
-		// 处理错误
-		console.log("-----test1bads")
-		console.error(error);
-	  });
-	  */
-	  //console.log("Mes:",Mes)
-	  //console.log('Data from API:', chainMes);
+
 	try {
 		const response = await transfer(JSON.stringify(postData));
-		// 处理响应
+		// Processing Response
 		return response
 	} catch (error) {
-		// 处理错误
+		// process error
 		console.log("-----test1bads");
 		console.error(error);
 		return error
@@ -211,27 +152,13 @@ export const stakeEth = async(Pool,Amount) => {
 		"feeRecipient": chainMes.feeRecipient.toString(),
 		"fee": "0"
 	}
-	console.log(postData)
-	function toDict(postData) {
-		return {
-			dapp: postData.dapp,
-			chainID: postData.chainId, // 修改为正确的属性名
-			action: postData.action,
-			from: postData.from,
-			fee: postData.fee,
-			feeRecipient: postData.feeRecipient,
-			nonce: postData.nonce,
-			version: postData.version,
-			params: postData.params, // 将字符串解析为 JSON 对象
-			sig: postData.sign
-		};
-	}
+
 	try {
 		const response = await transfer(JSON.stringify(postData));
-		// 处理响应
+		// Processing Response
 		return response
 	} catch (error) {
-		// 处理错误
+		// process error
 		console.log("-----test1bads");
 		console.error(error);
 		return error
@@ -284,27 +211,13 @@ export const stakeAr = async(Pool,Amount) => {
 		"feeRecipient": chainMes.feeRecipient.toString(),
 		"fee": "0"
 	}
-	console.log(postData)
-	function toDict(postData) {
-		return {
-			dapp: postData.dapp,
-			chainID: postData.chainId, // 修改为正确的属性名
-			action: postData.action,
-			from: postData.from,
-			fee: postData.fee,
-			feeRecipient: postData.feeRecipient,
-			nonce: postData.nonce,
-			version: postData.version,
-			params: postData.params, // 将字符串解析为 JSON 对象
-			sig: postData.sign
-		};
-	}
+
 	try {
 		const response = await transfer(JSON.stringify(postData));
-		// 处理响应
+		// Processing Response
 		return response
 	} catch (error) {
-		// 处理错误
+		// process error
 		console.log("-----test1bads");
 		console.error(error);
 		return error
@@ -342,7 +255,7 @@ export const unstakeEth = async(Pool,Amount) => {
 			'version:' + 'v1' + '\n' +
 			'params:' + JSON.stringify(params) + '\n';
 	const a = await signer(Mes)
-	console.log(a)
+
 
 	const postData = {
 		"action": "unstake",
@@ -356,28 +269,14 @@ export const unstakeEth = async(Pool,Amount) => {
 		"feeRecipient": chainMes.feeRecipient.toString(),
 		"fee": "0"
 	}
-	console.log(postData)
-	function toDict(postData) {
-		return {
-			dapp: postData.dapp,
-			chainID: postData.chainId, // 修改为正确的属性名
-			action: postData.action,
-			from: postData.from,
-			fee: postData.fee,
-			feeRecipient: postData.feeRecipient,
-			nonce: postData.nonce,
-			version: postData.version,
-			params: postData.params, // 将字符串解析为 JSON 对象
-			sig: postData.sign
-		};
-	}
+
 
 	try {
-	const response = await transfer(JSON.stringify(postData));
-	// 处理响应
-	return response
+		const response = await transfer(JSON.stringify(postData));
+		// Processing Response
+		return response
 	} catch (error) {
-		// 处理错误
+		// process error
 		console.log("-----test1bads");
 		console.error(error);
 		return error
@@ -428,27 +327,13 @@ export const unstakeAr = async(Pool,Amount) => {
 		"fee": "0"
 	}
 	
-	function toDict(postData) {
-		return {
-			dapp: postData.dapp,
-			chainID: postData.chainId, // 修改为正确的属性名
-			action: postData.action,
-			from: postData.from,
-			fee: postData.fee,
-			feeRecipient: postData.feeRecipient,
-			nonce: postData.nonce,
-			version: postData.version,
-			params: postData.params, // 将字符串解析为 JSON 对象
-			sig: postData.sign
-		};
-	}
 
 	try {
-	const response = await transfer(JSON.stringify(postData));
-	// 处理响应
-	return response
+		const response = await transfer(JSON.stringify(postData));
+		// Processing Response
+		return response
 	} catch (error) {
-		// 处理错误
+		// process error
 		console.log("-----test1bads");
 		console.error(error);
 		return error

@@ -1,10 +1,10 @@
 import { createI18n } from 'vue-i18n'
-import en from './en' //英文
-import zh from './zh' //中文
+import en from './en' //English
+import zh from './zh' //Chinese
  
 const i18n = createI18n({
-  legacy: false, // 使用CompotitionAPI必须添加这条.
-  //locale: localStorage('lang') || 'zh', // set locale设置默认值
+  legacy: false, // This must be added to use CompotitionAPI.
+  //locale: localStorage('lang') || 'zh', // set locale Setting default values
   locale: 'zh',
   fallbackLocale: 'zh', // set fallback locale
   messages: {

@@ -5,7 +5,7 @@ const http = axios.create({
   timeout: 5000
 });
 
-// 请求拦截器
+// request interceptor
 http.interceptors.request.use(
   config => {
     //config.headers.Authorization = 'Bearer token';
@@ -16,24 +16,24 @@ http.interceptors.request.use(
   }
 );
 
-// 响应拦截器
+// Response Interceptor
 http.interceptors.response.use(
   response => {
-    // 对响应进行处理
+    // Processing the response
     return response.data;
   },
   error => {
-    // 对错误进行处理
+    // Handling of errors
     return Promise.reject(error);
   }
 );
 
-// 封装get请求
+// Encapsulating get requests
 export const getChain = (params) => {
   return http.get('/info', { params });
 };
 
-// 封装 POST 请求
+// Encapsulating POST requests
 export const transfer = (data) => {
   return http.post('/submit', data);
 };

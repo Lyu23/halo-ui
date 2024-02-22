@@ -7,7 +7,7 @@ const userWallet = userWalletAll();
 
 declare global {
   interface Window {
-    ethereum?: any; // 适配实际情况，ethereum 可能是对象或 undefined
+    ethereum?: any; // Adaptation, ethereum may be an object or undefined.
   }
 }
 
@@ -25,10 +25,10 @@ export const connectWallet = async () => {
         const networkId = parseInt(networkIdString, 10);
 
         if (!isNaN(networkId)) {
-          // 构建 Infura 节点 URL
+          // Building Infura Node URLs
           const infuraUrl = `https://mainnet.infura.io/v3/1eeb3cf85565428b819a87c6dbc6644c`;
           
-          // 使用 Network 对象
+          // Using Network Objects
           const network: providers.Network = { chainId: networkId, name: 'mainnet' };
           //const provider = new ethers.providers.JsonRpcProvider(window.ethereum, network);
           ethProvider = new ethers.providers.Web3Provider(window.ethereum)
@@ -49,7 +49,6 @@ export const connectWallet = async () => {
   } else {
     console.error('MetaMask not detected. Please install it.');
   }
-  // 在这里添加你的具体实现
 };
 
 export const signer = async(signMess) => {
@@ -62,7 +61,7 @@ export const signer = async(signMess) => {
   const signature = await signer.signMessage(signMess);
   return signature
   console.log(signature)
-  //const signer = ethProvider.getSigner(); // 获取签名者
+  //const signer = ethProvider.getSigner(); // Get Signer
 }
 
 
