@@ -236,7 +236,7 @@ import { transferToEth, transferToAr, stakeEth, stakeAr, unstakeEth, unstakeAr }
 
 
 
-const decimals = ref(18) //目前的halo单位
+const decimals = ref(18) //Current halo units
 
 
 const userWallet = userWalletAll()
