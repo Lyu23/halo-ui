@@ -532,6 +532,7 @@ async function isWalletConnect() {
           let amount = new Decimal(item.amount);
           adminStake = adminStake.plus(amount);
         });
+        adminStake = adminStake.div(new Decimal(10).pow(decimals.value));
         PoolsAmount.value.push({"stakePool": "admin","amount": adminStake.toFixed(4).toString()});
       }
     } else {
@@ -554,6 +555,7 @@ async function isWalletConnect() {
           let amount = new Decimal(item.amount);
           adminStake = adminStake.plus(amount);
         });
+        adminStake = adminStake.div(new Decimal(10).pow(decimals.value));
         PoolsAmount.value.push({"stakePool": "admin","amount": adminStake.toFixed(4).toString()});
       }
     }
