@@ -1,6 +1,9 @@
-dev
-npm install
-npm run dev
-build
-npm install
-npm run build
+# halo-ui
+
+## dev
+1. npm install
+2. npm run dev
+
+## build
+1. npm install
+2. npm run build
