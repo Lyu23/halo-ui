@@ -580,7 +580,7 @@ async function isWalletConnect() {
   width: 100vw;
   height: 100vh;
   left: 0;
-  border: 5px solid #000000
+  background-color: #000000;
 }
 .top-main {
   margin-top: 20px;
