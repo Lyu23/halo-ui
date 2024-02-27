@@ -234,6 +234,8 @@ import { ethers, providers, utils } from 'ethers';
 
 import { transferToEth, transferToAr, stakeEth, stakeAr, unstakeEth, unstakeAr } from '../plugins/requests/request'
 
+import { Decimal } from 'decimal.js'
+import BigNumber from 'bignumber.js';
 
 
 const decimals = ref(18) //Current halo units
@@ -250,7 +252,7 @@ const switchLanguage = (lang) => {
     locale.value = zhCn;
   }
 };
-import { Decimal } from 'decimal.js'
+
 const isConnect = ref(false)
 //Enter the contents of the box
 const userAmount = ref('')
@@ -312,10 +314,10 @@ const fetchData = async () => {
 
 const TransFer = async() => {
   const walletType = userWallet.walletType
-  const a = 10 ** decimals.value
-
+  const a = (10n ** BigInt(decimals.value)).toString(); // 将 a 转换为字符串形式
+  const AmountValue = Amount.value.toString(); // 将 unstakeAmount.value 转换为字符串形式
   if ( walletType === 'Eth' ) {
-    const res = await transferToEth(ToUser.value, (Amount.value * a).toString())
+    const res = await transferToEth(ToUser.value, (BigInt(AmountValue) * BigInt(a)).toString())
     if (res.everHash) {
       ElNotification({
         title: 'Transfer Success',
@@ -353,9 +355,10 @@ const TransFer = async() => {
 }
 const stakeIn = async() => {
   const walletType = userWallet.walletType
-  const a = 10 ** decimals.value
+  const a = (10n ** BigInt(decimals.value)).toString(); // 将 a 转换为字符串形式
+  const stakeAmountValue = stakeAmount.value.toString(); // 将 unstakeAmount.value 转换为字符串形式
   if ( walletType === 'Eth' ) {
-    const res = await stakeEth(PoolSelect.value, (stakeAmount.value * a).toString())
+    const res = await stakeEth(PoolSelect.value, (BigInt(stakeAmountValue) * BigInt(a)).toString())
     if (res.everHash) {
       ElNotification({
         title: 'Transfer Success',
@@ -372,7 +375,7 @@ const stakeIn = async() => {
   }
   if ( walletType === 'Ar' ) {
     console.log("goods")
-    const res = await stakeAr(PoolSelect.value, (stakeAmount.value * a).toString())
+    const res = await stakeAr(PoolSelect.value, (BigInt(stakeAmount) * BigInt(a)).toString())
     if (res.everHash) {
       ElNotification({
         title: 'Transfer Success',
@@ -393,26 +396,28 @@ const stakeIn = async() => {
   }, 5000);
 }
 const unstakeOut = async() => {
-  const walletType = userWallet.walletType
-  const a = 10 ** decimals.value
-  if ( walletType === 'Eth' ) {
-    const res = await unstakeEth(PoolSelect.value, (unstakeAmount.value * a).toString())
+  const walletType = userWallet.walletType;
+  const a = (10n ** BigInt(decimals.value)).toString(); // 将 a 转换为字符串形式
+  const unstakeAmountValue = unstakeAmount.value.toString(); // 将 unstakeAmount.value 转换为字符串形式
+
+  if (walletType === 'Eth') {
+    const res = await unstakeEth(PoolSelect.value, (BigInt(unstakeAmountValue) * BigInt(a)).toString());
     if (res.everHash) {
       ElNotification({
         title: 'Transfer Success',
         message: `response is: ${res.everHash}`,
         type: 'success',
-      })
+      });
     } else {
       ElNotification({
         title: 'Transfer Failed',
         message: `response is: ${res.response.data}`,
         type: 'error',
-      })
+      });
     }
   }
   if ( walletType === 'Ar' ) {
-    const res = await unstakeAr(PoolSelect.value, (unstakeAmount.value * a).toString())
+    const res = await unstakeAr(PoolSelect.value, (BigInt(unstakeAmountValue) * BigInt(a)).toString())
     if (res.everHash) {
       ElNotification({
         title: 'Transfer Success',
