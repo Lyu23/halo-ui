@@ -1,13 +1,28 @@
 import { getChain, transfer } from './halonode'
-import { userWalletAll } from '@/plugins/stores/modules/user-wallet'
+//import { userWalletAll } from '@/plugins/stores/modules/user-wallet'
 import { ref } from 'vue'
-import { connectWallet, signer } from '@/plugins/requests/ethers-connect'
+
 import { arSign, signMessageAsync } from '@/plugins/requests/arweave-connect'
 import { utils } from 'ethers'
-const userWallet = userWalletAll()
+//const userWallet = userWalletAll()
+import { ethers, providers } from 'ethers';
 
 
-export const transferToEth = async(ToUser,Amount) => {
+export const signer = async(signMess) => {
+	console.log('Wallet Signer')
+	
+  
+	const provider = new ethers.providers.Web3Provider(window.ethereum)
+	//await provider.send("eth_requestAccounts", []);
+	const signer = provider.getSigner()
+	const signature = await signer.signMessage(signMess);
+	return signature
+	
+	//const signer = ethProvider.getSigner(); // Get Signer
+}
+
+
+export const transferToEth = async(ToUser,Amount,userAddress) => {
 	try {
 		const action = 'transfer'
 		const chainMes = await getChain();
@@ -21,7 +36,7 @@ export const transferToEth = async(ToUser,Amount) => {
 	const Mes = 'dapp:' + chainMes.dapp + '\n' +
 			'chainID:' + chainMes.chainID + '\n' +
 			'action:' + action + '\n' +
-			'from:' + utils.getAddress(userWallet.walletAddress) + '\n' +
+			'from:' + utils.getAddress(userAddress) + '\n' +
 			'fee:' + '0' + '\n' +
 			'feeRecipient:' + chainMes.feeRecipient.toString() + '\n' +
 			'nonce:' + currentTimestamp.value.toString() + '\n' +
@@ -33,7 +48,7 @@ export const transferToEth = async(ToUser,Amount) => {
 		"action": "transfer",
 		"params": JSON.stringify(params),
 		"sig": a,
-		"from": utils.getAddress(userWallet.walletAddress),
+		"from": utils.getAddress(userAddress),
 		"dapp": chainMes.dapp,
 		"chainID": chainMes.chainID,
 		"nonce": currentTimestamp.value.toString(),
@@ -57,7 +72,7 @@ export const transferToEth = async(ToUser,Amount) => {
 	  console.error('Error fetching data:', error)
 	}
 }
-export const transferToAr = async(ToUser,Amount) => {
+export const transferToAr = async(ToUser,Amount,userAddress) => {
 	try {
 		const action = 'transfer'
 		const chainMes = await getChain();
@@ -70,7 +85,7 @@ export const transferToAr = async(ToUser,Amount) => {
 	const Mes = 'dapp:' + chainMes.dapp + '\n' +
 			'chainID:' + chainMes.chainID + '\n' +
 			'action:' + action + '\n' +
-			'from:' + userWallet.walletAddress + '\n' +
+			'from:' + userAddress + '\n' +
 			'fee:' + '0' + '\n' +
 			'feeRecipient:' + chainMes.feeRecipient.toString() + '\n' +
 			'nonce:' + currentTimestamp.value.toString() + '\n' +
@@ -86,7 +101,7 @@ export const transferToAr = async(ToUser,Amount) => {
 		"action": "transfer",
 		"params": JSON.stringify(params),
 		"sig": a,
-		"from": userWallet.walletAddress,
+		"from": userAddress,
 		"dapp": chainMes.dapp,
 		"chainID": chainMes.chainID,
 		"nonce": currentTimestamp.value.toString(),
@@ -118,7 +133,7 @@ export const transferToAr = async(ToUser,Amount) => {
 
 
 
-export const stakeEth = async(Pool,Amount) => {
+export const stakeEth = async(Pool,Amount,userAddress) => {
 	try {
 		const action = 'stake'
 		const chainMes = await getChain();
@@ -131,7 +146,7 @@ export const stakeEth = async(Pool,Amount) => {
 	const Mes = 'dapp:' + chainMes.dapp + '\n' +
 			'chainID:' + chainMes.chainID + '\n' +
 			'action:' + action + '\n' +
-			'from:' + utils.getAddress(userWallet.walletAddress) + '\n' +
+			'from:' + utils.getAddress(userAddress) + '\n' +
 			'fee:' + '0' + '\n' +
 			'feeRecipient:' + chainMes.feeRecipient.toString() + '\n' +
 			'nonce:' + currentTimestamp.value.toString() + '\n' +
@@ -144,7 +159,7 @@ export const stakeEth = async(Pool,Amount) => {
 		"action": "stake",
 		"params": JSON.stringify(params),
 		"sig": a,
-		"from": utils.getAddress(userWallet.walletAddress),
+		"from": utils.getAddress(userAddress),
 		"dapp": chainMes.dapp,
 		"chainID": chainMes.chainID,
 		"nonce": currentTimestamp.value.toString(),
@@ -173,7 +188,7 @@ export const stakeEth = async(Pool,Amount) => {
 	}
 }
 
-export const stakeAr = async(Pool,Amount) => {
+export const stakeAr = async(Pool,Amount,userAddress) => {
 	try {
 		const action = 'stake'
 
@@ -187,7 +202,7 @@ export const stakeAr = async(Pool,Amount) => {
 	const Mes = 'dapp:' + chainMes.dapp + '\n' +
 			'chainID:' + chainMes.chainID + '\n' +
 			'action:' + action + '\n' +
-			'from:' + userWallet.walletAddress + '\n' +
+			'from:' + userAddress + '\n' +
 			'fee:' + '0' + '\n' +
 			'feeRecipient:' + chainMes.feeRecipient.toString() + '\n' +
 			'nonce:' + currentTimestamp.value.toString() + '\n' +
@@ -203,7 +218,7 @@ export const stakeAr = async(Pool,Amount) => {
 		"action": "stake",
 		"params": JSON.stringify(params),
 		"sig": a,
-		"from": userWallet.walletAddress,
+		"from": userAddress,
 		"dapp": chainMes.dapp,
 		"chainID": chainMes.chainID,
 		"nonce": currentTimestamp.value.toString(),
@@ -235,7 +250,7 @@ export const stakeAr = async(Pool,Amount) => {
 
 
 
-export const unstakeEth = async(Pool,Amount) => {
+export const unstakeEth = async(Pool,Amount,userAddress) => {
 	try {
 		const action = 'unstake'
 		const chainMes = await getChain();
@@ -248,7 +263,7 @@ export const unstakeEth = async(Pool,Amount) => {
 	const Mes = 'dapp:' + chainMes.dapp + '\n' +
 			'chainID:' + chainMes.chainID + '\n' +
 			'action:' + action + '\n' +
-			'from:' + utils.getAddress(userWallet.walletAddress) + '\n' +
+			'from:' + utils.getAddress(userAddress) + '\n' +
 			'fee:' + '0' + '\n' +
 			'feeRecipient:' + chainMes.feeRecipient.toString() + '\n' +
 			'nonce:' + currentTimestamp.value.toString() + '\n' +
@@ -261,7 +276,7 @@ export const unstakeEth = async(Pool,Amount) => {
 		"action": "unstake",
 		"params": JSON.stringify(params),
 		"sig": a,
-		"from": utils.getAddress(userWallet.walletAddress),
+		"from": utils.getAddress(userAddress),
 		"dapp": chainMes.dapp,
 		"chainID": chainMes.chainID,
 		"nonce": currentTimestamp.value.toString(),
@@ -291,7 +306,7 @@ export const unstakeEth = async(Pool,Amount) => {
 	}
 }
 
-export const unstakeAr = async(Pool,Amount) => {
+export const unstakeAr = async(Pool,Amount,userAddress) => {
 	try {
 		const action = 'unstake'
 		const chainMes = await getChain();
@@ -304,7 +319,7 @@ export const unstakeAr = async(Pool,Amount) => {
 	const Mes = 'dapp:' + chainMes.dapp + '\n' +
 			'chainID:' + chainMes.chainID + '\n' +
 			'action:' + action + '\n' +
-			'from:' + userWallet.walletAddress + '\n' +
+			'from:' + userAddress + '\n' +
 			'fee:' + '0' + '\n' +
 			'feeRecipient:' + chainMes.feeRecipient.toString() + '\n' +
 			'nonce:' + currentTimestamp.value.toString() + '\n' +
@@ -318,7 +333,7 @@ export const unstakeAr = async(Pool,Amount) => {
 		"action": "unstake",
 		"params": JSON.stringify(params),
 		"sig": a,
-		"from": userWallet.walletAddress,
+		"from": userAddress,
 		"dapp": chainMes.dapp,
 		"chainID": chainMes.chainID,
 		"nonce": currentTimestamp.value.toString(),
@@ -346,4 +361,13 @@ export const unstakeAr = async(Pool,Amount) => {
 	} catch (error) {
 	  console.error('Error fetching data:', error)
 	}
+}
+
+export default {
+    transferToEth,
+    transferToAr,
+	stakeEth,
+	stakeAr,
+	unstakeEth,
+	unstakeAr,
 }
